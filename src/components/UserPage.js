@@ -1,33 +1,30 @@
-import {useState} from "react";
-import {AppBar, Button, Container, Grid, IconButton, Paper, Toolbar, Typography} from "@mui/material";
+import {useState,useEffect } from "react";
+import {AppBar, Button, Container, Grid, IconButton, Paper, Snackbar, Toolbar, Typography} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PostModal from "./PostModal";
-
-const announcements = [
-    {
-        id: 1,
-        title: "Spacious 2-Bedroom Apartment",
-        description:
-            "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla ultrices purus eget erat suscipit viverra. Nulla auctor lorem quis dolor fermentum, vel bibendum arcu semper.",
-    },
-    {
-        id: 2,
-        title: "Luxury Penthouse with Panoramic View",
-        description:
-            "Nullam interdum sapien a quam suscipit, eu laoreet purus tincidunt. Nulla imperdiet nisi eget tellus mollis, ac interdum arcu finibus.",
-    },
-    {
-        id: 3,
-        title: "Charming Cottage in the Countryside",
-        description:
-            "Sed id enim in urna efficitur eleifend. Praesent bibendum mauris nec erat fermentum consequat. Fusce non mauris non magna tincidunt gravida.",
-    },
-];
+import axios from "axios";
+import ImageCarousel from "./Image";
+import {useHistory} from "react-router-dom";
 
 const UserPage = () => {
     const [open, setOpen] = useState(false);
+    const history = useHistory();
+
     const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
+    const [post, setPost] = useState([]);
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+
+    const handleSnackbarClose = () => {
+        setSnackbarOpen(false);
+        setSnackbarMessage('');
+    };
+
+    const handleRequestError = (error) => {
+        setSnackbarOpen(true);
+        setSnackbarMessage(error.message);
+    };
 
     const handleOpen = (announcement) => {
         setSelectedAnnouncement(announcement);
@@ -38,14 +35,30 @@ const UserPage = () => {
         setOpen(false);
         setSelectedAnnouncement(null);
     };
+    useEffect(() => {
+        const config = {
+            headers: {
+                'Authorization': 'Bearer '+ localStorage.getItem("token"),
+            },
+        };
+        axios
+            .get("http://localhost:8080/post/userPosts",config)
+            .then((response) => {
+                setPost(response.data)
+            })
+            .catch((error) => {
+                // handle error response
+            });
+    }, []);
 
     const handleDelete = (announcement) => {
         // Delete the announcement from the list
     };
 
-    const handleEdit = (announcement) => {
-        // Edit the announcement
-    };
+    function handleEdit(announcement) {
+        history.push(`/announcement/${announcement.id}/edit`);
+    }
+
 
     return (
         <>
@@ -54,17 +67,18 @@ const UserPage = () => {
                     <Typography variant="h6" style={{flexGrow: 1}}>
                         Real Estate Announcements
                     </Typography>
-                    <Button color="inherit">Home</Button>
+                    <Button color="inherit" href={'/homepage'}>Home</Button>
                     <Button color="inherit" onClick={handleOpen}>Create Announcement</Button>
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" style={{marginTop: "24px"}}>
                 <Grid container spacing={3}>
-                    {announcements.map((announcement) => (
+                    {post.map((announcement) => (
                         <Grid item xs={12} md={6} lg={4} key={announcement.id}>
                             <Paper style={{padding: "16px"}}>
                                 <Typography variant="h6">{announcement.title}</Typography>
                                 <Typography>{announcement.description}</Typography>
+                                <ImageCarousel images={announcement.images}/>
                                 <IconButton
                                     color="primary"
                                     onClick={() => handleEdit(announcement)}
@@ -82,8 +96,15 @@ const UserPage = () => {
                     ))}
                 </Grid>
             </Container>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                message={snackbarMessage}
+            />
             <PostModal
                 open={open}
+                handleRequestError={handleRequestError}
             />
         </>
     );

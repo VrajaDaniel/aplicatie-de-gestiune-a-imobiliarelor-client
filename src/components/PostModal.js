@@ -1,13 +1,7 @@
 import React, {useState} from "react";
 import {
-    AppBar,
     Box,
-    Button,
-    Checkbox,
-    Container,
     FormControl,
-    FormControlLabel,
-    FormGroup,
     Input,
     InputLabel,
     MenuItem,
@@ -15,10 +9,13 @@ import {
     Paper,
     Select,
     TextField,
-    Toolbar,
     Typography
 } from "@mui/material";
-import { styled } from "@mui/system";
+import {styled} from "@mui/system";
+import Maps from "./maps/Maps";
+import SearchBox from "./maps/SearchBox";
+import Button from "@mui/material/Button";
+import axios from "axios";
 
 const useStyles = styled((theme) => ({
     paper: {
@@ -38,23 +35,26 @@ const useStyles = styled((theme) => ({
     },
 }));
 
-const categories = ["Sale", "Rent"];
-const types = [
-    "Apartment",
-    "House",
-    "Villa",
-    "Office",
-    "Retail",
-    "Industrial",
-    "Land",
-];
+const categories = ["Apartamente", "Case", "Spatii_comerciale"];
+const types = ["Vanzare", "Inchiriere"];
 
-const Post= (props) => {
+const Post = (props) => {
     const classes = useStyles();
     const [open, setOpen] = useState(false);
     const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
 
+    const [selectPosition, setSelectPosition] = useState(null);
     const [files, setFiles] = useState([]);
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [city, setCity] = useState("");
+    const [price, setPrice] = useState(0);
+    const [usefulSurface, setUsefulSurface] = useState(0);
+    const [floor, setFloor] = useState(0);
+    const [numberRooms, setNumberRooms] = useState(1);
+    const [constructionYear, setConstructionYear] = useState(1900);
+    const [category, setCategory] = useState("");
+    const [type, setType] = useState("");
 
     const handleFileSelect = (e) => {
         setFiles([...files, ...e.target.files]);
@@ -73,28 +73,68 @@ const Post= (props) => {
         setSelectedAnnouncement(null);
     };
 
-    const handleCreate = (announcement) => {
+    const handleCreate = () => {
+        const data = {
+            latitude: selectPosition.lat,
+            longitude: selectPosition.lon,
+            title: title,
+            description: description,
+            city: city,
+            price: price,
+            usefulSurface: usefulSurface,
+            floor: floor,
+            numberRooms: numberRooms,
+            constructionYear: constructionYear,
+            category: category,
+            type: type,
+        };
+
+        const formData = new FormData();
+        files.forEach((file) => {
+            formData.append("files", file);
+        });
+        formData.append("postRequestBody", JSON.stringify(data));
+
+        const config = {
+            headers: {
+                'Authorization': 'Bearer '+ localStorage.getItem("token"),
+                'Content-Type': 'multipart/form-data'
+            },
+        };
+
+        axios
+            .post("http://localhost:8080/post", formData, config)
+            .then((response) => {
+                // handle success response
+            })
+            .catch((error) => {
+                // handle error response
+            });
         handleClose()
     };
 
     return (
         <div>
-            <Modal sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} open={props.open} onClose={props.onClose}>
-                <Paper className={classes.paper} sx={{ maxHeight: '90vh', maxWidth: '90vw', overflow: 'auto' }}>
+            <Modal sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} open={props.open}
+                   onClose={props.onClose}>
+                <Paper className={classes.paper} sx={{maxHeight: '90vh', maxWidth: '90vw', overflow: 'auto'}}>
                     <Typography variant="h6">Create Announcement</Typography>
                     <form>
-                        <TextField label="Title" fullWidth sx={{mt: 2}}/>
-                        <TextField label="Description" multiline fullWidth sx={{mt: 2}}/>
-                        <TextField label="Date" fullWidth sx={{mt: 2}}/>
-                        <TextField label="City" fullWidth sx={{mt: 2}}/>
-                        <TextField label="Price" fullWidth sx={{mt: 2}}/>
-                        <TextField label="Useful Surface" fullWidth sx={{mt: 2}}/>
-                        <TextField label="Floor" fullWidth sx={{mt: 2}}/>
-                        <TextField label="Number of Rooms" fullWidth sx={{mt: 2}}/>
-                        <TextField label="Construction Year" fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setTitle(e.target.value)} label="Titlu" fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setDescription(e.target.value)} label="Descriere" multiline
+                                   fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setCity(e.target.value)} label="Oras" fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setPrice(e.target.value)} label="Pret" fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setUsefulSurface(e.target.value)} label="Suprafata utila" fullWidth
+                                   sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setFloor(e.target.value)} label="Etaj" fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setNumberRooms(e.target.value)} label="Numar de camere" fullWidth
+                                   sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setConstructionYear(e.target.value)} label="Anul constructiei"
+                                   fullWidth sx={{mt: 2}}/>
                         <FormControl fullWidth className={classes.formControl} sx={{mt: 2}}>
                             <InputLabel>Category</InputLabel>
-                            <Select>
+                            <Select onChange={(e) => setCategory(e.target.value)}>
                                 {categories.map((category) => (
                                     <MenuItem key={category} value={category}>
                                         {category}
@@ -104,7 +144,7 @@ const Post= (props) => {
                         </FormControl>
                         <FormControl fullWidth className={classes.formControl} sx={{mt: 2}}>
                             <InputLabel>Type</InputLabel>
-                            <Select>
+                            <Select onChange={(e) => setType(e.target.value)}>
                                 {types.map((type) => (
                                     <MenuItem key={type} value={type}>
                                         {type}
@@ -112,15 +152,31 @@ const Post= (props) => {
                                 ))}
                             </Select>
                         </FormControl>
-                        <FormGroup className={classes.checkboxControl} sx={{mt: 2}}>
-                            <FormControlLabel control={<Checkbox/>} label="Balcony"/>
-                            <FormControlLabel control={<Checkbox/>} label="Garage"/>
-                            <FormControlLabel control={<Checkbox/>} label="Furnished"/>
-                            <FormControlLabel control={<Checkbox/>} label="Pet-friendly"/>
-                        </FormGroup>
-                        <TextField label="Latitude" fullWidth sx={{mt: 2}}/>
-                        <TextField label="Longitude" fullWidth sx={{mt: 2}}/>
-                        <TextField label="User ID" fullWidth sx={{mt: 2}}/>
+                        <div
+                            style={{
+                                display: "flex",
+                                flexDirection: "row",
+                                width: "100%",
+                                height: "40vh",
+                                paddingTop: 20,
+                            }}
+                        >
+                            <div
+                                style={{
+                                    width: "50vw",
+                                    height: "100%",
+                                    border: "2px solid #dd742d",
+                                }}
+                            >
+                                <Maps selectPosition={selectPosition}/>
+                            </div>
+                            <div style={{width: "50vw", paddingLeft: "10px"}}>
+                                <SearchBox
+                                    selectPosition={selectPosition}
+                                    setSelectPosition={setSelectPosition}
+                                />
+                            </div>
+                        </div>
                         <InputLabel htmlFor="file-upload" shrink>
                             Select files
                         </InputLabel>
@@ -131,10 +187,10 @@ const Post= (props) => {
                             onChange={handleFileSelect}
                             inputProps={{
                                 accept: "image/*",
-                                style: { display: "none" },
+                                style: {display: "none"},
                             }}
                         />
-                        <Box sx={{ display: "flex", flexWrap: "wrap" }}>
+                        <Box sx={{display: "flex", flexWrap: "wrap"}}>
                             {files.map((file, index) => (
                                 <Box
                                     key={index}
@@ -150,7 +206,7 @@ const Post= (props) => {
                                         alt={`Preview ${index + 1}`}
                                         width="100%"
                                         height="100%"
-                                        style={{ objectFit: "cover" }}
+                                        style={{objectFit: "cover"}}
                                     />
                                     <Button
                                         onClick={() => handleRemoveFile(index)}
