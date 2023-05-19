@@ -52,7 +52,18 @@ const UserPage = () => {
     }, []);
 
     const handleDelete = (announcement) => {
-        // Delete the announcement from the list
+        const config = {
+            headers: {
+                'Authorization': 'Bearer '+ localStorage.getItem("token"),
+            },
+        };
+        axios
+            .delete("http://localhost:8080/post/"+announcement.id,config)
+            .then((response) => {
+            })
+            .catch((error) => {
+                // handle error response
+            });
     };
 
     function handleEdit(announcement) {
@@ -72,9 +83,9 @@ const UserPage = () => {
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" style={{marginTop: "24px"}}>
-                <Grid container spacing={3}>
+                <Grid container>
                     {post.map((announcement) => (
-                        <Grid item xs={12} md={6} lg={4} key={announcement.id}>
+                        <Grid item xs={12} key={announcement.id}>
                             <Paper style={{padding: "16px"}}>
                                 <Typography variant="h6">{announcement.title}</Typography>
                                 <Typography>{announcement.description}</Typography>

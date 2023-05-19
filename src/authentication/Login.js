@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { TextField, Button } from '@mui/material';
-import { useHistory } from 'react-router-dom';
+import React, {useState} from 'react';
+import {Button, TextField} from '@mui/material';
+import {useHistory} from 'react-router-dom';
 import axios from 'axios';
 
 const LoginForm = (props) => {
@@ -25,21 +25,26 @@ const LoginForm = (props) => {
             console.log(error);
         }
     }
+
     return (
-        <form  onSubmit={handleSubmit}>
-            <TextField
-                label="Email"
-                variant="outlined"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-            />
-            <TextField
-                label="Password"
-                type="password"
-                variant="outlined"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-            />
+        <form onSubmit={handleSubmit}>
+            <div style={{marginBottom: '10px'}}>
+                <TextField
+                    label="Email"
+                    variant="outlined"
+                    value={email}
+                    onChange={(event) => setEmail(event.target.value)}
+                />
+            </div>
+            <div style={{marginBottom: '10px'}}>
+                <TextField
+                    label="Password"
+                    type="password"
+                    variant="outlined"
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                />
+            </div>
             <Button
                 type="submit"
                 variant="contained"

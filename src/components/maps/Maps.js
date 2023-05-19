@@ -38,6 +38,7 @@ export default function Maps(props) {
     const { selectPosition } = props;
     const locationSelection = [selectPosition?.lat, selectPosition?.lon];
 
+
     return (
         <MapContainer
             center={position}

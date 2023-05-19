@@ -5,7 +5,6 @@ import {Box, Button, FormControl, Grid, Input, InputLabel, MenuItem, Paper, Sele
 import {styled} from "@mui/system";
 import Maps from "./maps/Maps";
 import SearchBox from "./maps/SearchBox";
-import ImageCarousel from "./Image";
 
 const useStyles = styled((theme) => ({
     form: {
@@ -30,7 +29,7 @@ const PostUpdate = () => {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    const [date, setDate] = useState('');
+    //const [date, setDate] = useState('');
     const [city, setCity] = useState('');
     const [price, setPrice] = useState(0);
     const [usefulSurface, setUsefulSurface] = useState(0);
@@ -70,7 +69,7 @@ const PostUpdate = () => {
                     const data = response.data;
                     setTitle(data.title);
                     setDescription(data.description);
-                    setDate(data.date);
+                    //setDate(data.date);
                     setCity(data.city);
                     setPrice(data.price);
                     setUsefulSurface(data.usefulSurface);
@@ -79,13 +78,70 @@ const PostUpdate = () => {
                     setConstructionYear(data.constructionYear);
                     setCategory(data.category);
                     setType(data.type);
-                    //setSelectPosition(data.selectPosition);
+                    const blobs = data.images.map((base64String) => {
+                        // Remove data URL prefix if present
+                        const dataUrlPrefix = 'data:image/png;base64,';
+                        const base64Data = base64String.replace(dataUrlPrefix, '');
+
+                        // Decode Base64 data and create Uint8Array
+                        const decodedData = atob(base64Data);
+                        const dataArray = new Uint8Array(decodedData.length);
+                        for (let i = 0; i < decodedData.length; i++) {
+                            dataArray[i] = decodedData.charCodeAt(i);
+                        }
+
+                        return new Blob([dataArray], {type: 'image/png'}); // Provide appropriate MIME type
+                    });
+                    setFiles(blobs)
+                    setSelectPosition({
+                        lon: data.longitude,
+                        lat: data.latitude
+                    });
                 }
             })
 
     }, []);
 
     const isLoading = announcement === null;
+
+    const handleUpdate = () => {
+        const data = {
+            latitude: selectPosition.lat,
+            longitude: selectPosition.lon,
+            title: title,
+            description: description,
+            city: city,
+            price: price,
+            usefulSurface: usefulSurface,
+            floor: floor,
+            numberRooms: numberRooms,
+            constructionYear: constructionYear,
+            category: category,
+            type: type,
+        };
+
+        const formData = new FormData();
+        files.forEach((file) => {
+            formData.append("files", file);
+        });
+        formData.append("postRequestBody", JSON.stringify(data));
+
+        const config = {
+            headers: {
+                'Authorization': 'Bearer '+ localStorage.getItem("token"),
+                'Content-Type': 'multipart/form-data'
+            },
+        };
+
+        axios
+            .put("http://localhost:8080/post/"+id, formData, config)
+            .then((response) => {
+                // handle success response
+            })
+            .catch((error) => {
+                // handle error response
+            });
+    };
 
     return (
         <div>
@@ -106,6 +162,7 @@ const PostUpdate = () => {
                                     required
                                 />
                                 <br/>
+                                <br/>
                                 <TextField
                                     label="Description"
                                     variant="outlined"
@@ -116,17 +173,6 @@ const PostUpdate = () => {
                                     required
                                 />
                                 <br/>
-                                <TextField
-                                    label="Date"
-                                    type="date"
-                                    variant="outlined"
-                                    value={date}
-                                    onChange={(event) => setDate(event.target.value)}
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    required
-                                />
                                 <br/>
                                 <TextField
                                     label="City"
@@ -135,6 +181,7 @@ const PostUpdate = () => {
                                     onChange={(event) => setCity(event.target.value)}
                                     required
                                 />
+                                <br/>
                                 <br/>
                                 <TextField
                                     label="Price"
@@ -150,6 +197,7 @@ const PostUpdate = () => {
                                     required
                                 />
                                 <br/>
+                                <br/>
                                 <TextField
                                     label="Useful Surface"
                                     variant="outlined"
@@ -163,6 +211,7 @@ const PostUpdate = () => {
                                     }}
                                     required
                                 />
+                                <br/>
                                 <br/>
                                 <TextField
                                     label="Floor"
@@ -178,6 +227,7 @@ const PostUpdate = () => {
                                     required
                                 />
                                 <br/>
+                                <br/>
                                 <TextField
                                     label="Number of Rooms"
                                     variant="outlined"
@@ -192,6 +242,7 @@ const PostUpdate = () => {
                                     required
                                 />
                                 <br/>
+                                <br/>
                                 <TextField
                                     label="Construction Year"
                                     variant="outlined"
@@ -199,6 +250,7 @@ const PostUpdate = () => {
                                     value={constructionYear}
                                     onChange={(event) => setConstructionYear(event.target.value)}
                                 />
+                                <br/>
                                 <br/>
                                 <FormControl variant="outlined" required>
                                     <InputLabel id="category-label">Category</InputLabel>
@@ -208,12 +260,12 @@ const PostUpdate = () => {
                                         value={category}
                                         onChange={(event) => setCategory(event.target.value)}
                                     >
-                                        <MenuItem value="real-estate">Real Estate</MenuItem>
-                                        <MenuItem value="vehicles">Vehicles</MenuItem>
-                                        <MenuItem value="jobs">Jobs</MenuItem>
-                                        <MenuItem value="services">Services</MenuItem>
+                                        <MenuItem value="Apartamente">Apartamente</MenuItem>
+                                        <MenuItem value="Case">Case</MenuItem>
+                                        <MenuItem value="Spatii comerciale">Spatii comerciale</MenuItem>
                                     </Select>
                                 </FormControl>
+                                <br/>
                                 <br/>
                                 <FormControl variant="outlined" required>
                                     <InputLabel id="type-label">Type</InputLabel>
@@ -223,14 +275,13 @@ const PostUpdate = () => {
                                         value={type}
                                         onChange={(event) => setType(event.target.value)}
                                     >
-                                        <MenuItem value="apartment">Apartment</MenuItem>
-                                        <MenuItem value="house">House</MenuItem>
-                                        <MenuItem value="office">Office</MenuItem>
-                                        <MenuItem value="land">Land</MenuItem>
+                                        <MenuItem value="Vanzare">Vanzare</MenuItem>
+                                        <MenuItem value="Inchiriere">Inchiriere</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <br/>
-                                <Button type="submit" variant="contained" color="primary">
+                                <br/>
+                                <Button type="submit" onClick={handleUpdate} variant="contained" color="primary">
                                     Submit
                                 </Button>
 
@@ -260,7 +311,7 @@ const PostUpdate = () => {
                                             />
                                         </div>
                                     </div>
-                                    <ImageCarousel images={announcement.images}/>
+                                    <br/>
                                     <InputLabel htmlFor="file-upload" shrink>
                                         Select files
                                     </InputLabel>
