@@ -1,55 +1,109 @@
-import React from 'react';
-import { Container, Typography, Grid, Card, CardContent } from '@mui/material';
-
-
+import React, {useEffect, useState} from 'react';
+import {AppBar, Button, Card, CardContent, Container, Grid, Toolbar, Typography,Box,Pagination} from '@mui/material';
+import axios from "axios";
+import ImageCarousel from "./Image";
+import {useHistory} from "react-router-dom";
+import FilterSortComponent from "./filter/Filter";
 
 const HomePage = () => {
+    const history = useHistory();
+    const [allAnnouncements, setAllAnnouncements] = useState([]);
+    const [announcements, setAnnouncements] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const itemsPerPage = 6;
 
-    const announcements = [
-        {
-            id: 1,
-            title: 'Luxury apartments in the heart of the city',
-            description:
-                'Discover our latest luxury apartments in the heart of the city, with stunning views and modern amenities.',
-            imageUrl: 'https://source.unsplash.com/random/400x200?apartment',
-        },
-        {
-            id: 2,
-            title: 'Beautiful countryside villas',
-            description:
-                'Escape to the countryside and experience our beautiful villas, surrounded by rolling hills and picturesque landscapes.',
-            imageUrl: 'https://source.unsplash.com/random/400x200?villa',
-        },
-        {
-            id: 3,
-            title: 'Stylish condos with ocean views',
-            description:
-                'Enjoy the best of both worlds with our stylish condos, located just steps away from the beach and offering stunning ocean views.',
-            imageUrl: 'https://source.unsplash.com/random/400x200?condo',
-        },
-    ];
+    const [currentPage, setCurrentPage] = useState(1);
+    const totalPages = Math.ceil(announcements.length / itemsPerPage);
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    const currentItems = announcements.slice(startIndex, endIndex);
+
+    const handlePageChange = (event, page) => {
+        setCurrentPage(page);
+    };
+
+    function handleView(announcement) {
+        history.push(`/announcement/${announcement.id}/view`);
+    }
+
+    const [showFilters, setShowFilters] = useState(false);
+
+    const toggleFilters = () => {
+        setShowFilters(!showFilters);
+    };
+
+    useEffect(() => {
+        const config = {
+            headers: {
+                'Authorization': 'Bearer ' + localStorage.getItem("token"),
+            },
+        };
+        axios
+            .get("http://localhost:8080/post/getAll", config)
+            .then((response) => {
+                setAnnouncements(response.data)
+                setAllAnnouncements(response.data)
+                console.log(announcements)
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                setIsLoading(false);
+            });
+    }, []);
 
     return (
-        <Container maxWidth="lg">
-            <Typography variant="h3" component="h1" align="center" gutterBottom>
-                Real Estate Announcements
-            </Typography>
-            <Grid container spacing={4}>
-                {announcements.map((announcement) => (
-                    <Grid item key={announcement.id} xs={12} md={4}>
-                        <Card sx={{ height: '100%' }}>
-                            <CardContent>
-                                <Typography gutterBottom variant="h5" component="h2">
-                                    {announcement.title}
-                                </Typography>
-                                <Typography>{announcement.description}</Typography>
-                            </CardContent>
-                            <img src={announcement.imageUrl} alt="" style={{ height: 200, width: '100%', display: 'block' }} />
-                        </Card>
-                    </Grid>
-                ))}
-            </Grid>
-        </Container>
+        <>
+            <AppBar position="static">
+                <Toolbar>
+                    <Button color="inherit" href={'/userPage'}>Anunturile mele</Button>
+                    <Button color="inherit" onClick={toggleFilters}>Afiseaza Filtre</Button>
+                </Toolbar>
+            </AppBar>
+            {
+                isLoading === true ? (
+                    <div>Page is loading...</div>
+                ) : (
+                    <div>
+                        <Box>
+                            <br/>
+                            <br/>
+                            <Container maxWidth="lg">
+                                <Grid container direction="row" container spacing={4}>
+                                    {currentItems.map((announcement) => (
+                                        <Grid item key={announcement.id} xs={12} md={4}>
+                                            <Card sx={{height: '100%'}}>
+                                                <CardContent>
+                                                    <Typography gutterBottom variant="h5" component="h2">
+                                                        {announcement.title}
+                                                    </Typography>
+                                                    <Typography>{announcement.description}</Typography>
+                                                </CardContent>
+                                                <ImageCarousel images={announcement.images} width={200} height={200}/>
+                                                <br/>
+                                                <Button onClick={()=>handleView(announcement)}>Vizualizeaza</Button>
+                                            </Card>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </Container>
+
+                            <Box display="flex" justifyContent="center" mt={2}>
+                                <Pagination
+                                    count={totalPages}
+                                    page={currentPage}
+                                    onChange={handlePageChange}
+                                    variant="outlined"
+                                    shape="rounded"
+                                />
+                            </Box>
+                        </Box>
+                        <FilterSortComponent isLoading={isLoading} setAnnouncements={setAnnouncements} announcements={announcements} allAnnouncements={allAnnouncements} showFilters={showFilters} toggleFilters={toggleFilters}/>
+                    </div>
+                )
+            }
+        </>
     );
 };
 

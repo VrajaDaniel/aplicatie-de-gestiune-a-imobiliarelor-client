@@ -43,7 +43,7 @@ export default function Maps(props) {
         <MapContainer
             center={position}
             zoom={8}
-            style={{ width: "100%", height: "100%" }}
+            style={{ width: "100%", height: "100%", position:"inherit"}}
         >
             <TileLayer
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'

@@ -1,7 +1,20 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useParams} from "react-router-dom";
-import {Box, Button, FormControl, Grid, Input, InputLabel, MenuItem, Paper, Select, TextField} from '@mui/material';
+import {
+    AppBar,
+    Box,
+    Button,
+    FormControl,
+    Grid,
+    Input,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    TextField,
+    Toolbar, Typography
+} from '@mui/material';
 import {styled} from "@mui/system";
 import Maps from "./maps/Maps";
 import SearchBox from "./maps/SearchBox";
@@ -145,6 +158,13 @@ const PostUpdate = () => {
 
     return (
         <div>
+            <AppBar position="static">
+                <Toolbar>
+                    <Button color="inherit" href={'/homepage'}>Acasa</Button>
+                    <Button color="inherit" href={'/userPage'}>Anunturile mele</Button>
+                </Toolbar>
+            </AppBar>
+
             {isLoading ? (
                 <div>Loading...</div> // Show loading component while announcement is null
             ) : (

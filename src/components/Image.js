@@ -1,8 +1,7 @@
 import {useState} from "react";
 import {styled} from "@mui/system";
-import {Card, CardMedia, Container, IconButton} from "@mui/material";
+import {Card, Container, Grid, IconButton} from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import Image from "react-image";
 
 const useStyles = styled({
     root: {
@@ -25,7 +24,7 @@ const useStyles = styled({
     },
 });
 
-const ImageCarousel = ({images}) => {
+const ImageCarousel = ({images, width, height}) => {
     const classes = useStyles();
     const [index, setIndex] = useState(0);
 
@@ -38,24 +37,27 @@ const ImageCarousel = ({images}) => {
     };
 
     return (
-        <Container style={{width: "200px",height:"200px", marginTop: "24px"}}>
-            <div className={classes.root}>
-                <Card>
-                    <img
-                        src={"data:image/png;base64," + images[index]}
-                        alt={"Image " + index}
-                        width={200}
-                        height={200}
-                    />
-                </Card>
-                {images.length > 1 && (
-                    <IconButton className={classes.button} onClick={handleNext}>
-                        <ArrowForwardIosIcon/>
-                    </IconButton>
-                )}
+            <div>
+                    <Grid container direction="column" spacing={2}>
+                        <Grid item>
+                            <img
+                                src={"data:image/png;base64," + images[index]}
+                                alt={"Image " + index}
+                                width={width}
+                                height={height}
+                            />
+                        </Grid>
+                        <Grid item>
+                            {images.length > 1 && (
+                                <IconButton className={classes.button} onClick={handleNext}>
+                                    <ArrowForwardIosIcon/>
+                                </IconButton>
+                            )}
+                        </Grid>
+                    </Grid>
             </div>
-        </Container>
-    );
+    )
+        ;
 };
 
 export default ImageCarousel;

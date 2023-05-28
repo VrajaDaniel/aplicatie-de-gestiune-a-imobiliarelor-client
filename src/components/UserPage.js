@@ -1,4 +1,4 @@
-import {useState,useEffect } from "react";
+import React, {useState,useEffect } from "react";
 import {AppBar, Button, Container, Grid, IconButton, Paper, Snackbar, Toolbar, Typography} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -75,11 +75,8 @@ const UserPage = () => {
         <>
             <AppBar position="static">
                 <Toolbar>
-                    <Typography variant="h6" style={{flexGrow: 1}}>
-                        Real Estate Announcements
-                    </Typography>
-                    <Button color="inherit" href={'/homepage'}>Home</Button>
-                    <Button color="inherit" onClick={handleOpen}>Create Announcement</Button>
+                    <Button color="inherit" href={'/homepage'}>Acasa</Button>
+                    <Button color="inherit" onClick={handleOpen}>Creeaza Anunt</Button>
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" style={{marginTop: "24px"}}>
@@ -89,7 +86,7 @@ const UserPage = () => {
                             <Paper style={{padding: "16px"}}>
                                 <Typography variant="h6">{announcement.title}</Typography>
                                 <Typography>{announcement.description}</Typography>
-                                <ImageCarousel images={announcement.images}/>
+                                <ImageCarousel images={announcement.images} width={200} height={200}/>
                                 <IconButton
                                     color="primary"
                                     onClick={() => handleEdit(announcement)}
@@ -115,6 +112,7 @@ const UserPage = () => {
             />
             <PostModal
                 open={open}
+                handleCloseModal={handleClose}
                 handleRequestError={handleRequestError}
             />
         </>

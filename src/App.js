@@ -7,6 +7,8 @@ import UserPage from "./components/UserPage";
 import Login from "./authentication/Login"
 import axios from "axios";
 import PostUpdate from "./components/PostUpdate";
+import SignUpPage from "./components/SignUpPage";
+import PostDetails from "./components/PostDetails";
 function App() {
 
     const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -49,6 +51,8 @@ function App() {
                   <ProtectedRoute path='/homepage' component={Home} isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
                   <ProtectedRoute path='/userPage' component={UserPage} isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
                   <ProtectedRoute path="/announcement/:id/edit" component={PostUpdate} isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
+                  <Route exact path='/signUpPage' component={SignUpPage} />
+                  <ProtectedRoute path="/announcement/:id/view" component={PostDetails} isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
               </Switch>
             </div>
       </Router>

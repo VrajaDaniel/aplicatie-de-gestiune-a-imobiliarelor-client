@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Button, TextField} from '@mui/material';
 import {useHistory} from 'react-router-dom';
 import axios from 'axios';
+import login from '../images/login.png'
 
 const LoginForm = (props) => {
     const [email, setEmail] = useState('');
@@ -27,7 +28,18 @@ const LoginForm = (props) => {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}
+              style={{
+                  backgroundImage: `url(${login})`,
+                  backgroundSize: 'cover',
+                  backgroundRepeat: 'no-repeat',
+                  minHeight: '100vh',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column'
+              }}
+        >
             <div style={{marginBottom: '10px'}}>
                 <TextField
                     label="Email"
@@ -51,6 +63,14 @@ const LoginForm = (props) => {
                 color="primary"
             >
                 Login
+            </Button>
+            <br/>
+            <Button
+                href='/signUpPage'
+                variant="contained"
+                color="primary"
+            >
+                Creeaza Cont
             </Button>
         </form>
     );

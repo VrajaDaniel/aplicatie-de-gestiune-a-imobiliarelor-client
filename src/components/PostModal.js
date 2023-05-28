@@ -116,7 +116,7 @@ const Post = (props) => {
     return (
         <div>
             <Modal sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} open={props.open}
-                   onClose={props.onClose}>
+                   onClose={()=>props.handleCloseModal()}>
                 <Paper className={classes.paper} sx={{maxHeight: '90vh', maxWidth: '90vw', overflow: 'auto'}}>
                     <Typography variant="h6">Create Announcement</Typography>
                     <form>
