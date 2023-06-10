@@ -12,8 +12,9 @@ import {
     MenuItem,
     Paper,
     Select,
+    Snackbar,
     TextField,
-    Toolbar, Typography
+    Toolbar
 } from '@mui/material';
 import {styled} from "@mui/system";
 import Maps from "./maps/Maps";
@@ -42,7 +43,7 @@ const PostUpdate = () => {
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-    //const [date, setDate] = useState('');
+    const [date, setDate] = useState('');
     const [city, setCity] = useState('');
     const [price, setPrice] = useState(0);
     const [usefulSurface, setUsefulSurface] = useState(0);
@@ -53,6 +54,10 @@ const PostUpdate = () => {
     const [type, setType] = useState('');
     const [selectPosition, setSelectPosition] = useState(null);
     const [files, setFiles] = useState([]);
+
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -82,7 +87,7 @@ const PostUpdate = () => {
                     const data = response.data;
                     setTitle(data.title);
                     setDescription(data.description);
-                    //setDate(data.date);
+                    setDate(data.date);
                     setCity(data.city);
                     setPrice(data.price);
                     setUsefulSurface(data.usefulSurface);
@@ -130,7 +135,7 @@ const PostUpdate = () => {
             numberRooms: numberRooms,
             constructionYear: constructionYear,
             category: category,
-            type: type,
+            type: type
         };
 
         const formData = new FormData();
@@ -141,18 +146,24 @@ const PostUpdate = () => {
 
         const config = {
             headers: {
-                'Authorization': 'Bearer '+ localStorage.getItem("token"),
+                'Authorization': 'Bearer ' + localStorage.getItem("token"),
                 'Content-Type': 'multipart/form-data'
             },
         };
 
         axios
-            .put("http://localhost:8080/post/"+id, formData, config)
+            .put("http://localhost:8080/post/" + id, formData, config)
             .then((response) => {
-                // handle success response
+                if (response.status === 201 || response.status === 200) {
+                    setSnackbarSeverity('success');
+                    setSnackbarMessage('Anuntul dumneavoastra a putut fi actualizat cu succes!');
+                    setSnackbarOpen(true);
+                }
             })
             .catch((error) => {
-                // handle error response
+                setSnackbarSeverity('error');
+                setSnackbarMessage('Anuntul nu a putut fi actualizat!');
+                setSnackbarOpen(true);
             });
     };
 
@@ -160,8 +171,8 @@ const PostUpdate = () => {
         <div>
             <AppBar position="static">
                 <Toolbar>
-                    <Button color="inherit" href={'/homepage'}>Acasa</Button>
-                    <Button color="inherit" href={'/userPage'}>Anunturile mele</Button>
+                    <Button color="inherit" href={'/homepage'}>Acasă</Button>
+                    <Button color="inherit" href={'/userPage'}>Anunțurile mele</Button>
                 </Toolbar>
             </AppBar>
 
@@ -175,7 +186,7 @@ const PostUpdate = () => {
                         <Paper style={{padding: "16px"}}>
                             <Grid item>
                                 <TextField
-                                    label="Title"
+                                    label="Titlu"
                                     variant="outlined"
                                     value={title}
                                     onChange={(event) => setTitle(event.target.value)}
@@ -184,7 +195,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <TextField
-                                    label="Description"
+                                    label="Descriere"
                                     variant="outlined"
                                     value={description}
                                     onChange={(event) => setDescription(event.target.value)}
@@ -195,7 +206,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <TextField
-                                    label="City"
+                                    label="Oraș"
                                     variant="outlined"
                                     value={city}
                                     onChange={(event) => setCity(event.target.value)}
@@ -204,7 +215,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <TextField
-                                    label="Price"
+                                    label="Preț"
                                     variant="outlined"
                                     type="number"
                                     value={price}
@@ -219,7 +230,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <TextField
-                                    label="Useful Surface"
+                                    label="Suprafață Utilă"
                                     variant="outlined"
                                     type="number"
                                     value={usefulSurface}
@@ -234,7 +245,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <TextField
-                                    label="Floor"
+                                    label="Etaj"
                                     variant="outlined"
                                     type="number"
                                     value={floor}
@@ -249,7 +260,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <TextField
-                                    label="Number of Rooms"
+                                    label="Număr de camere"
                                     variant="outlined"
                                     type="number"
                                     value={numberRooms}
@@ -264,7 +275,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <TextField
-                                    label="Construction Year"
+                                    label="Anul construcției"
                                     variant="outlined"
                                     type="number"
                                     value={constructionYear}
@@ -273,7 +284,7 @@ const PostUpdate = () => {
                                 <br/>
                                 <br/>
                                 <FormControl variant="outlined" required>
-                                    <InputLabel id="category-label">Category</InputLabel>
+                                    <InputLabel id="category-label">Categorie</InputLabel>
                                     <Select
                                         labelId="category-label"
                                         label="Category"
@@ -282,28 +293,25 @@ const PostUpdate = () => {
                                     >
                                         <MenuItem value="Apartamente">Apartamente</MenuItem>
                                         <MenuItem value="Case">Case</MenuItem>
-                                        <MenuItem value="Spatii comerciale">Spatii comerciale</MenuItem>
+                                        <MenuItem value="Spatii_comerciale">Spații comerciale</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <br/>
                                 <br/>
                                 <FormControl variant="outlined" required>
-                                    <InputLabel id="type-label">Type</InputLabel>
+                                    <InputLabel id="type-label">Tip</InputLabel>
                                     <Select
                                         labelId="type-label"
                                         label="Type"
                                         value={type}
                                         onChange={(event) => setType(event.target.value)}
                                     >
-                                        <MenuItem value="Vanzare">Vanzare</MenuItem>
-                                        <MenuItem value="Inchiriere">Inchiriere</MenuItem>
+                                        <MenuItem value="Vanzare">Vânzare</MenuItem>
+                                        <MenuItem value="Inchiriere">Închiriere</MenuItem>
                                     </Select>
                                 </FormControl>
                                 <br/>
                                 <br/>
-                                <Button type="submit" onClick={handleUpdate} variant="contained" color="primary">
-                                    Submit
-                                </Button>
 
                                 <Grid item>
                                     <div
@@ -315,26 +323,46 @@ const PostUpdate = () => {
                                             paddingTop: 20,
                                         }}
                                     >
-                                        <div
-                                            style={{
-                                                width: "50vw",
-                                                height: "100%",
-                                                border: "2px solid #dd742d",
-                                            }}
-                                        >
-                                            <Maps selectPosition={selectPosition}/>
+                                        <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                                            <div style={{width: "350px", paddingLeft: "10px"}}>
+                                                <SearchBox
+                                                    selectPosition={selectPosition}
+                                                    setSelectPosition={setSelectPosition}
+                                                />
+                                            </div>
+                                            <div
+                                                style={{
+                                                    width: "25vw",
+                                                    height: "100%",
+                                                    border: "2px solid #dd742d",
+                                                    marginTop: "10px", // optional: space between the search box and the map
+                                                }}
+                                            >
+                                                <Maps selectPosition={selectPosition}/>
+                                            </div>
                                         </div>
-                                        <div style={{width: "100px", paddingLeft: "10px"}}>
-                                            <SearchBox
-                                                selectPosition={selectPosition}
-                                                setSelectPosition={setSelectPosition}
-                                            />
-                                        </div>
+
+
                                     </div>
                                     <br/>
-                                    <InputLabel htmlFor="file-upload" shrink>
-                                        Select files
-                                    </InputLabel>
+                                    <div style={{display: "flex", justifyContent: "center"}}>
+                                        <InputLabel htmlFor="file-upload" style={{
+                                            backgroundColor: "#3f51b5", // Change color as per your needs
+                                            color: "white",
+                                            width: "160px",
+                                            padding: "6px 16px",
+                                            fontSize: "0.875rem",
+                                            lineHeight: 1.75,
+                                            borderRadius: "4px",
+                                            textTransform: "uppercase",
+                                            cursor: "pointer",
+                                            '&:hover': {
+                                                backgroundColor: "#002984", // Change hover color as per your needs
+                                            }
+                                        }}>
+                                            Selectează pozele
+                                        </InputLabel>
+                                    </div>
                                     <Input
                                         id="file-upload"
                                         type="file"
@@ -385,12 +413,39 @@ const PostUpdate = () => {
                                             </Box>
                                         ))}
                                     </Box>
+                                    <Button type="submit" onClick={handleUpdate} variant="contained" color="primary">
+                                        Salvează
+                                    </Button>
                                 </Grid>
                             </Grid>
                         </Paper>
                     </Grid>
                 </div>
             )}
+            <Snackbar
+                open={snackbarOpen}
+                onClose={() => setSnackbarOpen(false)}
+                message={snackbarMessage}
+                ContentProps={{
+                    style: {
+                        backgroundColor: snackbarSeverity === 'success' ? 'green' : 'red',
+                        color: 'white',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    },
+                }}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                }}
+            />
         </div>
 
     );

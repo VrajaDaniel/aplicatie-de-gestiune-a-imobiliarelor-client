@@ -4,6 +4,7 @@ import {TextField} from "@mui/material";
 import axios from "axios";
 import Snackbar from '@mui/material/Snackbar';
 import {useHistory} from "react-router-dom";
+import login from "../images/login.png";
 
 function SignUpPage() {
     const [formData, setFormData] = useState({
@@ -59,8 +60,17 @@ const validatePhoneNumber = (phoneNumber) => {
 
 return (
     <div>
-        <h2>Înregistrare</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}
+              style={{
+                  backgroundImage: `url(${login})`,
+                  backgroundSize: 'cover',
+                  backgroundRepeat: 'no-repeat',
+                  minHeight: '100vh',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexDirection: 'column'
+              }}>
             <div>
                 <label htmlFor="lastName">Nume:</label>
                 <br/>

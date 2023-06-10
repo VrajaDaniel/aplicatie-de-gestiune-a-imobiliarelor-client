@@ -1,7 +1,5 @@
 import * as React from 'react';
-import {Global} from '@emotion/react';
 import {styled} from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
 import {grey} from '@mui/material/colors';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -46,14 +44,18 @@ function SwipeableEdgeDrawer(props) {
 
     const filterAnnouncements = (announcements) => {
         return announcements.filter((announcement) => {
+
             const meetsUsefullSurface = announcement.usefulSurface >= minUsefullSurface;
             const meetsPriceRange = announcement.price >= minPrice && announcement.price <= maxPrice;
             const meetsCategory = category === '' || announcement.category === category;
             const meetsType = type === '' || announcement.type === type;
-            const meetsRoomNumber = roomNumber === -1 || announcement.roomNumber === roomNumber;
+            const meetsRoomNumber = roomNumber === -1 || announcement.numberRooms === roomNumber;
             const meetsFloor = floor === -1 || announcement.floor === floor;
             const meetsCity = city === '' || announcement.city === city;
             const meetsConstructionYear = announcement.constructionYear >= minConstructionYear;
+            console.log("Anouncement number"+meetsRoomNumber)
+            console.log(announcement.numberRooms,"equal",roomNumber)
+            console.log("is equal?",announcement.numberRooms===roomNumber)
 
             return (
                 meetsUsefullSurface &&
@@ -89,17 +91,6 @@ function SwipeableEdgeDrawer(props) {
 
     return (
         <Root>
-            <CssBaseline/>
-            <Global
-                styles={{
-                    '.MuiDrawer-root > .MuiPaper-root': {
-                        height: `calc(50% - ${drawerBleeding}px)`,
-                        overflow: 'visible',
-                    },
-                }}
-            />
-            <Box sx={{textAlign: 'center', pt: 1}}>
-            </Box>
             <SwipeableDrawer
                 container={container}
                 anchor="bottom"
@@ -113,7 +104,6 @@ function SwipeableEdgeDrawer(props) {
             >
                 <StyledBox
                     sx={{
-                        position: 'absolute',
                         top: -drawerBleeding,
                         borderTopLeftRadius: 8,
                         borderTopRightRadius: 8,
@@ -137,26 +127,26 @@ function SwipeableEdgeDrawer(props) {
                     <Grid container spacing={2} marginTop={"10px"}>
                         <Grid item xs={1} sm={1} md={4}>
                             <TextField
-                                label="Suprafata minima"
+                                label="Suprafață minimă"
                                 variant="outlined"
                                 value={minUsefullSurface === 0 ? '' : minUsefullSurface}
-                                onChange={(event) => setUsefullSurface(event.target.value)}
+                                onChange={(event) => setUsefullSurface(Number(event.target.value))}
                             />
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
                             <TextField
-                                label="Pret minim"
+                                label="Preț minim"
                                 variant="outlined"
                                 value={minPrice === 0 ? '' : minPrice}
-                                onChange={(event) => setMinPrice(event.target.value)}
+                                onChange={(event) => setMinPrice(Number(event.target.value))}
                             />
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
                             <TextField
-                                label="Pret maxim"
+                                label="Preț maxim"
                                 variant="outlined"
                                 value={maxPrice === 999999999 ? '' :maxPrice}
-                                onChange={(event) => setMaxPrice(event.target.value)}
+                                onChange={(event) => setMaxPrice(Number(event.target.value))}
                             />
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
@@ -164,23 +154,23 @@ function SwipeableEdgeDrawer(props) {
                                 label="Etaj"
                                 variant="outlined"
                                 value={floor === -1 ? '' :floor}
-                                onChange={(event) => setFloor(event.target.value)}
+                                onChange={(event) => setFloor(Number(event.target.value))}
                             />
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
                             <TextField
-                                label="Numar camere"
+                                label="Număr camere"
                                 variant="outlined"
                                 value={roomNumber === -1 ? '':roomNumber}
-                                onChange={(event) => setRoomNumber(event.target.value)}
+                                onChange={(event) => setRoomNumber(Number(event.target.value))}
                             />
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
                             <TextField
-                                label="Anul constructiei"
+                                label="Anul minim de construcție"
                                 variant="outlined"
                                 value={minConstructionYear === 0 ? '':minConstructionYear}
-                                onChange={(event) => setMinConstructionYear(event.target.value)}
+                                onChange={(event) => setMinConstructionYear(Number(event.target.value))}
                             />
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
@@ -209,7 +199,7 @@ function SwipeableEdgeDrawer(props) {
                             </Select>
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
-                            <InputLabel id="city">Oras</InputLabel>
+                            <InputLabel id="city">Oraș</InputLabel>
                             {props.allAnnouncements && props.allAnnouncements.length > 0 ? (
                                 <Select
                                     labelId="type"
@@ -217,21 +207,24 @@ function SwipeableEdgeDrawer(props) {
                                     value={city}
                                     onChange={(event) => setCity(event.target.value)}
                                 >
-                                    {props.allAnnouncements.map((option) => (
-                                        <MenuItem key={option.city} value={option.city}>
-                                            {option.city}
-                                        </MenuItem>
-                                    ))}
+                                    {
+                                        [...new Set(props.allAnnouncements.map(option => option.city))].map(city => (
+                                            <MenuItem key={city} value={city}>
+                                                {city}
+                                            </MenuItem>
+                                        ))
+                                    }
                                 </Select>
                             ) : (
                                 <span>Loading data...</span>
                             )}
                         </Grid>
+
                         <Grid item xs={1} sm={1} md={4}>
-                            <Button onClick={() => applyFilters()}>Aplica filtre</Button>
+                            <Button onClick={() => applyFilters()}>Aplică filtre</Button>
                         </Grid>
                         <Grid item xs={1} sm={1} md={4}>
-                            <Button onClick={() => deleteFilters()}>Sterge filtre</Button>
+                            <Button onClick={() => deleteFilters()}>Șterge filtre</Button>
                         </Grid>
                     </Grid>
                 </StyledBox>

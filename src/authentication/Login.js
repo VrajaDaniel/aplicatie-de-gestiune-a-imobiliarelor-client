@@ -21,7 +21,7 @@ const LoginForm = (props) => {
             const token = response.data.token;
             localStorage.setItem('token', token);
             props.handleLogin();
-            history.push('/userPage');
+            history.push('/homepage');
         } catch (error) {
             console.log(error);
         }
@@ -50,7 +50,7 @@ const LoginForm = (props) => {
             </div>
             <div style={{marginBottom: '10px'}}>
                 <TextField
-                    label="Password"
+                    label="Parolă"
                     type="password"
                     variant="outlined"
                     value={password}
@@ -62,7 +62,7 @@ const LoginForm = (props) => {
                 variant="contained"
                 color="primary"
             >
-                Login
+                Autentificare
             </Button>
             <br/>
             <Button
@@ -70,7 +70,7 @@ const LoginForm = (props) => {
                 variant="contained"
                 color="primary"
             >
-                Creeaza Cont
+                Creează Cont
             </Button>
         </form>
     );

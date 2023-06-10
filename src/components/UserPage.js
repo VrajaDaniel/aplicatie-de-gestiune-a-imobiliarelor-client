@@ -15,11 +15,9 @@ const UserPage = () => {
     const [post, setPost] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
-    const handleSnackbarClose = () => {
-        setSnackbarOpen(false);
-        setSnackbarMessage('');
-    };
+
 
     const handleRequestError = (error) => {
         setSnackbarOpen(true);
@@ -60,9 +58,17 @@ const UserPage = () => {
         axios
             .delete("http://localhost:8080/post/"+announcement.id,config)
             .then((response) => {
+                if (response.status === 201 || response.status === 200) {
+                    setPost(post.filter(item => item.id !== announcement.id))
+                    setSnackbarSeverity('success');
+                    setSnackbarMessage('Anuntul dumneavoastra a fost sters cu succes!');
+                    setSnackbarOpen(true);
+                }
             })
             .catch((error) => {
-                // handle error response
+                setSnackbarSeverity('error');
+                setSnackbarMessage('Anuntul nu a putut fi sters!');
+                setSnackbarOpen(true);
             });
     };
 
@@ -70,13 +76,18 @@ const UserPage = () => {
         history.push(`/announcement/${announcement.id}/edit`);
     }
 
+    function logout(){
+        localStorage.clear();
+        history.push("/");
+    }
 
     return (
         <>
             <AppBar position="static">
                 <Toolbar>
-                    <Button color="inherit" href={'/homepage'}>Acasa</Button>
-                    <Button color="inherit" onClick={handleOpen}>Creeaza Anunt</Button>
+                    <Button color="inherit" href={'/homepage'}>Acasă</Button>
+                    <Button color="inherit" onClick={handleOpen}>Creează Anunț</Button>
+                    <Button color="inherit" onClick={logout} style={{ marginLeft: 'auto' }}>Deconectare</Button>
                 </Toolbar>
             </AppBar>
             <Container maxWidth="lg" style={{marginTop: "24px"}}>
@@ -85,7 +96,7 @@ const UserPage = () => {
                         <Grid item xs={12} key={announcement.id}>
                             <Paper style={{padding: "16px"}}>
                                 <Typography variant="h6">{announcement.title}</Typography>
-                                <Typography>{announcement.description}</Typography>
+                                <Typography>Preț: {announcement.price} EUR</Typography>
                                 <ImageCarousel images={announcement.images} width={200} height={200}/>
                                 <IconButton
                                     color="primary"
@@ -106,14 +117,34 @@ const UserPage = () => {
             </Container>
             <Snackbar
                 open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={handleSnackbarClose}
+                onClose={() => setSnackbarOpen(false)}
                 message={snackbarMessage}
+                ContentProps={{
+                    style: {
+                        backgroundColor: snackbarSeverity === 'success' ? 'green' : 'red',
+                        color: 'white',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    },
+                }}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                }}
             />
             <PostModal
                 open={open}
                 handleCloseModal={handleClose}
                 handleRequestError={handleRequestError}
+                post={post}
+                setPost={setPost}
             />
         </>
     );

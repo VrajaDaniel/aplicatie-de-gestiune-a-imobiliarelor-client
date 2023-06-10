@@ -18,6 +18,7 @@ export default function SearchBox(props) {
     const { selectPosition, setSelectPosition } = props;
     const [searchText, setSearchText] = useState("");
     const [listPlace, setListPlace] = useState([]);
+    const [showList, setShowList] = useState(true);
 
     return (
         <div style={{ display: "flex", flexDirection: "column", maxHeight: "40vh"}}>
@@ -56,6 +57,7 @@ export default function SearchBox(props) {
                                 .then((result) => {
                                     console.log(JSON.parse(result));
                                     setListPlace(JSON.parse(result));
+                                    setShowList(true);
                                 })
                                 .catch((err) => console.log("err: ", err));
                         }}
@@ -64,25 +66,28 @@ export default function SearchBox(props) {
                     </Button>
                 </div>
             </div>
-            <div style={{overflowY: "auto"}}>
-                <List component="nav" aria-label="main mailbox folders">
-                    {listPlace.map((item) => {
-                        return (
-                            <div key={item?.place_id}>
-                                <ListItem
-                                    button
-                                    onClick={() => {
-                                        setSelectPosition(item);
-                                    }}
-                                >
-                                    <ListItemText primary={item?.display_name} />
-                                </ListItem>
-                                <Divider />
-                            </div>
-                        );
-                    })}
-                </List>
-            </div>
+            {  showList===false ? null :
+                <div style={{overflowY: "auto"}}>
+                    <List component="nav" aria-label="main mailbox folders">
+                        {listPlace.map((item) => {
+                            return (
+                                <div key={item?.place_id}>
+                                    <ListItem
+                                        button
+                                        onClick={() => {
+                                            setSelectPosition(item);
+                                            setShowList(false);
+                                        }}
+                                    >
+                                        <ListItemText primary={item?.display_name}/>
+                                    </ListItem>
+                                    <Divider/>
+                                </div>
+                            );
+                        })}
+                    </List>
+                </div>
+            }
         </div>
     );
 }

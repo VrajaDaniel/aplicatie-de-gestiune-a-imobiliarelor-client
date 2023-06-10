@@ -8,6 +8,7 @@ import {
     Modal,
     Paper,
     Select,
+    Snackbar,
     TextField,
     Typography
 } from "@mui/material";
@@ -56,6 +57,10 @@ const Post = (props) => {
     const [category, setCategory] = useState("");
     const [type, setType] = useState("");
 
+    const [snackbarOpen, setSnackbarOpen] = useState(false);
+    const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+
     const handleFileSelect = (e) => {
         setFiles([...files, ...e.target.files]);
     };
@@ -70,7 +75,6 @@ const Post = (props) => {
 
     const handleClose = () => {
         setOpen(false);
-        setSelectedAnnouncement(null);
     };
 
     const handleCreate = () => {
@@ -97,7 +101,7 @@ const Post = (props) => {
 
         const config = {
             headers: {
-                'Authorization': 'Bearer '+ localStorage.getItem("token"),
+                'Authorization': 'Bearer ' + localStorage.getItem("token"),
                 'Content-Type': 'multipart/form-data'
             },
         };
@@ -105,35 +109,43 @@ const Post = (props) => {
         axios
             .post("http://localhost:8080/post", formData, config)
             .then((response) => {
-                // handle success response
+                if (response.status === 201 || response.status === 200) {
+                    let postArray=props.post;
+                    postArray.push(response.data);
+                    props.setPost(postArray)
+                    setSnackbarSeverity('success');
+                    setSnackbarMessage('Anuntul dumneavoastra a fost adaugat cu succes!');
+                    setSnackbarOpen(true);
+                    props.handleCloseModal();
+                }
             })
             .catch((error) => {
-                // handle error response
+                setSnackbarSeverity('error');
+                setSnackbarMessage('Anuntul nu a putut fi adaugat, verificati daca ati completat toate campurile!');
+                setSnackbarOpen(true);
             });
-        handleClose()
     };
 
     return (
         <div>
             <Modal sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}} open={props.open}
-                   onClose={()=>props.handleCloseModal()}>
+                   onClose={() => props.handleCloseModal()}>
                 <Paper className={classes.paper} sx={{maxHeight: '90vh', maxWidth: '90vw', overflow: 'auto'}}>
-                    <Typography variant="h6">Create Announcement</Typography>
                     <form>
                         <TextField onChange={(e) => setTitle(e.target.value)} label="Titlu" fullWidth sx={{mt: 2}}/>
                         <TextField onChange={(e) => setDescription(e.target.value)} label="Descriere" multiline
                                    fullWidth sx={{mt: 2}}/>
-                        <TextField onChange={(e) => setCity(e.target.value)} label="Oras" fullWidth sx={{mt: 2}}/>
-                        <TextField onChange={(e) => setPrice(e.target.value)} label="Pret" fullWidth sx={{mt: 2}}/>
-                        <TextField onChange={(e) => setUsefulSurface(e.target.value)} label="Suprafata utila" fullWidth
+                        <TextField onChange={(e) => setCity(e.target.value)} label="Oraș" fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setPrice(e.target.value)} label="Preț" fullWidth sx={{mt: 2}}/>
+                        <TextField onChange={(e) => setUsefulSurface(e.target.value)} label="Suprafață utilă" fullWidth
                                    sx={{mt: 2}}/>
                         <TextField onChange={(e) => setFloor(e.target.value)} label="Etaj" fullWidth sx={{mt: 2}}/>
-                        <TextField onChange={(e) => setNumberRooms(e.target.value)} label="Numar de camere" fullWidth
+                        <TextField onChange={(e) => setNumberRooms(e.target.value)} label="Număr de camere" fullWidth
                                    sx={{mt: 2}}/>
-                        <TextField onChange={(e) => setConstructionYear(e.target.value)} label="Anul constructiei"
+                        <TextField onChange={(e) => setConstructionYear(e.target.value)} label="Anul construcției"
                                    fullWidth sx={{mt: 2}}/>
                         <FormControl fullWidth className={classes.formControl} sx={{mt: 2}}>
-                            <InputLabel>Category</InputLabel>
+                            <InputLabel>Categorie</InputLabel>
                             <Select onChange={(e) => setCategory(e.target.value)}>
                                 {categories.map((category) => (
                                     <MenuItem key={category} value={category}>
@@ -143,7 +155,7 @@ const Post = (props) => {
                             </Select>
                         </FormControl>
                         <FormControl fullWidth className={classes.formControl} sx={{mt: 2}}>
-                            <InputLabel>Type</InputLabel>
+                            <InputLabel>Tip</InputLabel>
                             <Select onChange={(e) => setType(e.target.value)}>
                                 {types.map((type) => (
                                     <MenuItem key={type} value={type}>
@@ -177,8 +189,21 @@ const Post = (props) => {
                                 />
                             </div>
                         </div>
-                        <InputLabel htmlFor="file-upload" shrink>
-                            Select files
+                        <br/>
+                        <InputLabel htmlFor="file-upload" style={{
+                                backgroundColor: "#3f51b5", // Change color as per your needs
+                                color: "white",
+                                width:"160px",
+                                padding: "6px 16px",
+                                fontSize: "0.875rem",
+                                lineHeight: 1.75,
+                                borderRadius: "4px",
+                                textTransform: "uppercase",
+                                cursor: "pointer",
+                                '&:hover': {
+                                    backgroundColor: "#002984", // Change hover color as per your needs
+                                }}}>
+                            Selectează pozele
                         </InputLabel>
                         <Input
                             id="file-upload"
@@ -231,11 +256,35 @@ const Post = (props) => {
                             ))}
                         </Box>
                         <Button variant="contained" color="primary" fullWidth onClick={handleCreate} sx={{mt: 2}}>
-                            Create
+                            Creează
                         </Button>
                     </form>
                 </Paper>
             </Modal>
+            <Snackbar
+                open={snackbarOpen}
+                onClose={() => setSnackbarOpen(false)}
+                message={snackbarMessage}
+                ContentProps={{
+                    style: {
+                        backgroundColor: snackbarSeverity === 'success' ? 'green' : 'red',
+                        color: 'white',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                    },
+                }}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+                style={{
+                    position: 'fixed',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                }}
+            />
         </div>
     );
 };

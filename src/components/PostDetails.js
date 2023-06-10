@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import axios from "axios";
-import {AppBar, Button, Card, Grid, Paper, Toolbar, Typography} from '@mui/material';
+import {AppBar, Button, Card, CardContent, Grid, Paper, Toolbar, Typography} from '@mui/material';
 import {styled} from "@mui/system";
 import ImageCarousel from "./Image";
 import ContactForm from "./contactForm/ContactForm";
@@ -56,11 +56,8 @@ export default function PostDetails() {
         <div>
             <AppBar position="static">
                 <Toolbar>
-                    <Typography variant="h6" style={{flexGrow: 1}}>
-                        Anunturi Imobiliare
-                    </Typography>
-                    <Button color="inherit" href={'/homepage'}>Acasa</Button>
-                    <Button color="inherit" href={'/userPage'}>Pagina utilizatorului</Button>
+                    <Button color="inherit" href={'/homepage'}>Acasă</Button>
+                    <Button color="inherit" href={'/userPage'}>Anunțurile mele</Button>
                 </Toolbar>
             </AppBar>
             {
@@ -99,13 +96,19 @@ export default function PostDetails() {
                                         </div>
                                     </Grid>
                                 </Grid>
+                                <Grid item sx={{ marginLeft: "200px", textAlign: "left" }}>
+                                    <Typography variant="h6">Descrierea proprietății:</Typography>
+                                    <Typography variant="body1">
+                                        {announcement.description}
+                                    </Typography>
+                                </Grid>
                                 <br/>
                                 <Grid container spacing={2}>
-                                    <Grid item xs={6} >
-                                        <Typography  variant="h6">Detalii:</Typography>
+                                    <Grid item xs={6}>
+                                        <Typography variant="h6">Detalii:</Typography>
                                         <Typography textAlign={"left"} marginLeft={"200px"} variant="body1">
                                             Categorie: {announcement.category}<br/>
-                                            <Divider />
+                                            <Divider/>
                                             Tip: {announcement.type}<br/>
                                         </Typography>
                                     </Grid>
@@ -113,25 +116,21 @@ export default function PostDetails() {
                                         <br/>
                                         <Typography textAlign={"left"} variant="body1">
                                             Etaj: {announcement.floor}<br/>
-                                            <Divider />
+                                            <Divider/>
                                             Număr de camere: {announcement.numberRooms}<br/>
-                                            <Divider />
+                                            <Divider/>
                                             Anul construcției: {announcement.constructionYear}<br/>
-                                            <Divider />
-                                            Dată: {announcement.date}<br/>
-                                            <Divider />
+                                            <Divider/>
                                             Oraș: {announcement.city}<br/>
-                                            <Divider />
-                                            Preț: {announcement.price}<br/>
-                                            <Divider />
-                                            Suprafață utilă: {announcement.usefulSurface}<br/>
+                                            <Divider/>
+                                            Suprafață utilă: {announcement.usefulSurface} mp<br/>
                                         </Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
                             <Grid item spacing={2}>
                                 <Grid item>
-                                    <ContactForm/>
+                                    <ContactForm postId={id}/>
                                 </Grid>
                             </Grid>
                         </Grid>
