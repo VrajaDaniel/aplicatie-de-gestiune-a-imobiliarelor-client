@@ -61,7 +61,6 @@ const PostUpdate = () => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        // Handle form submission here
     };
 
     const handleFileSelect = (e) => {
@@ -108,7 +107,7 @@ const PostUpdate = () => {
                             dataArray[i] = decodedData.charCodeAt(i);
                         }
 
-                        return new Blob([dataArray], {type: 'image/png'}); // Provide appropriate MIME type
+                        return new Blob([dataArray], {type: 'image/png'});
                     });
                     setFiles(blobs)
                     setSelectPosition({

@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {styled} from "@mui/system";
-import {Card, Container, Grid, IconButton} from "@mui/material";
+import {Grid, IconButton} from "@mui/material";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
 const useStyles = styled({

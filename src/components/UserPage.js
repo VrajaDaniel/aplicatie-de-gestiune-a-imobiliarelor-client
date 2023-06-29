@@ -10,14 +10,11 @@ import {useHistory} from "react-router-dom";
 const UserPage = () => {
     const [open, setOpen] = useState(false);
     const history = useHistory();
-
     const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
     const [post, setPost] = useState([]);
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success');
-
-
 
     const handleRequestError = (error) => {
         setSnackbarOpen(true);
@@ -45,7 +42,9 @@ const UserPage = () => {
                 setPost(response.data)
             })
             .catch((error) => {
-                // handle error response
+                setSnackbarSeverity('error');
+                setSnackbarMessage('Nu se pot afisa anunturile!');
+                setSnackbarOpen(true);
             });
     }, []);
 

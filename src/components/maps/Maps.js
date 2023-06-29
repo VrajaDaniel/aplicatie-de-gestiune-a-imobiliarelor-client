@@ -1,5 +1,5 @@
-import React, { useEffect, Component } from "react";
-import { MapContainer, Marker, Popup, TileLayer, useMap, useMapEvents } from "react-leaflet";
+import React, { useEffect } from "react";
+import { MapContainer, Marker, TileLayer, useMap} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -33,11 +33,9 @@ function ResetCenterView(props) {
     return null;
 }
 
-
 export default function Maps(props) {
     const { selectPosition } = props;
     const locationSelection = [selectPosition?.lat, selectPosition?.lon];
-
 
     return (
         <MapContainer
